@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitness Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0d12;
+    --card: #111620;
+    --card2: #161d2a;
+    --border: #1e2d3d;
+    --teal: #00d4b8;
+    --teal2: #00f5dd;
+    --teal-dim: rgba(0,212,184,0.12);
+    --teal-glow: rgba(0,212,184,0.35);
+    --yellow: #f5c518;
+    --text: #e8edf5;
+    --muted: #5a7080;
+    --muted2: #3a4d5c;
+    --red: #ff4a6e;
+    --green: #39e58c;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Stars background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 15%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 25% 60%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 40% 30%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 55% 80%, rgba(255,255,255,0.25) 0%, transparent 100%),
+      radial-gradient(2px 2px at 70% 10%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 50%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 90% 75%, rgba(255,255,255,0.45) 0%, transparent 100%),
+      radial-gradient(1px 1px at 15% 90%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 45%, rgba(255,255,255,0.2) 0%, transparent 100%),
+      radial-gradient(2px 2px at 35% 5%, rgba(0,212,184,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 25%, rgba(0,212,184,0.3) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 36px 20px 50px;
+  }
+
+  /* HEADER */
+  .page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 400;
+    text-align: center;
+    letter-spacing: 0.12em;
+    color: var(--text);
+    margin-bottom: 28px;
+  }
+
+  /* HERO BANNER */
+  .hero {
+    background: linear-gradient(135deg, #0d1a26 0%, #0a2030 50%, #051820 100%);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 30px 36px;
+    margin-bottom: 22px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(0,212,184,0.18) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .hero h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1rem, 2.5vw, 1.35rem);
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .hero h2 span { color: var(--yellow); }
+  .hero p {
+    font-size: 1rem;
+    color: var(--muted);
+    font-weight: 400;
+    line-height: 1.55;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  /* GRID */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 16px;
+  }
+
+  /* CARDS */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 22px 20px 20px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .card:hover {
+    border-color: rgba(0,212,184,0.3);
+    box-shadow: 0 0 20px rgba(0,212,184,0.08);
+  }
+
+  .card-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    color: var(--muted);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 16px;
+  }
+  .card-label svg { opacity: 0.7; flex-shrink: 0; }
+
+  /* TIMER CARD */
+  .timer-card {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .timer-ring-wrap {
+    position: relative;
+    width: 160px;
+    height: 160px;
+    margin: 10px auto 18px;
+  }
+  .timer-ring-wrap svg {
+    transform: rotate(-90deg);
+    position: absolute;
+    inset: 0;
+  }
+  .ring-bg { fill: none; stroke: var(--card2); stroke-width: 8; }
+  .ring-progress {
+    fill: none;
+    stroke: var(--teal);
+    stroke-width: 8;
+    stroke-linecap: round;
+    stroke-dasharray: 440;
+    stroke-dashoffset: 0;
+    filter: drop-shadow(0 0 6px var(--teal-glow));
+    transition: stroke-dashoffset 1s linear;
+  }
+  .timer-display {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+  }
+  .timer-min-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.5rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .timer-time {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.9rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+  .timer-sec-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.5rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+  .timer-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+  .btn-start {
+    background: transparent;
+    border: 1.5px solid var(--muted2);
+    color: var(--text);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 10px 26px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .btn-start:hover, .btn-start.active {
+    border-color: var(--teal);
+    color: var(--teal);
+    box-shadow: 0 0 14px var(--teal-dim);
+  }
+  .btn-icon {
+    background: var(--teal-dim);
+    border: 1px solid rgba(0,212,184,0.2);
+    color: var(--teal);
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.25s;
+    font-size: 0.9rem;
+  }
+  .btn-icon:hover { background: rgba(0,212,184,0.22); }
+
+  /* WORKOUT SETUP CARD */
+  .setup-card { grid-column: 2; grid-row: 1; }
+  .difficulty-btns {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+  .diff-btn {
+    flex: 1;
+    padding: 7px 0;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .diff-btn:hover { border-color: var(--muted); color: var(--text); }
+  .diff-btn.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    color: var(--teal);
+  }
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .stat-val {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .stat-unit {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.65rem;
+    color: var(--muted);
+    margin-left: 3px;
+    letter-spacing: 0.1em;
+  }
+
+  /* DURATION CARD */
+  .duration-card { grid-column: 3; grid-row: 1; }
+  .duration-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    margin-top: 18px;
+  }
+  .dur-time {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.1rem;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    min-width: 90px;
+    text-align: center;
+  }
+  .dur-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.5rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: 4px;
+  }
+  .dur-btn {
+    background: var(--card2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    font-weight: 300;
+    line-height: 1;
+  }
+  .dur-btn:hover {
+    border-color: var(--teal);
+    color: var(--teal);
+    background: var(--teal-dim);
+  }
+
+  /* CALORIES CARD */
+  .calories-card { grid-column: 2; grid-row: 2; }
+  .gauge-wrap {
+    position: relative;
+    width: 150px;
+    height: 80px;
+    margin: 8px auto 0;
+    overflow: visible;
+  }
+  .gauge-wrap svg { overflow: visible; }
+  .gauge-bg { fill: none; stroke: var(--card2); stroke-width: 10; stroke-linecap: round; }
+  .gauge-fill {
+    fill: none;
+    stroke: var(--teal);
+    stroke-width: 10;
+    stroke-linecap: round;
+    filter: drop-shadow(0 0 5px var(--teal-glow));
+    transition: stroke-dashoffset 0.8s ease;
+  }
+  .gauge-val {
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+  }
+  .gauge-num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: var(--text);
+    display: block;
+    line-height: 1;
+  }
+  .gauge-sub {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.5rem;
+    color: var(--muted);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* STREAK CARD */
+  .streak-card { grid-column: 3; grid-row: 2; }
+  .streak-day-badge {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.5rem;
+    color: var(--muted);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-align: right;
+    margin-bottom: 2px;
+  }
+  .streak-num {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.3rem;
+    font-weight: 800;
+    color: var(--text);
+    text-align: right;
+    line-height: 1;
+    margin-bottom: 14px;
+  }
+  .streak-num span { color: var(--muted); font-weight: 300; font-size: 1.4rem; }
+  .days-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .day-item { text-align: center; flex: 1; }
+  .day-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.42rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+  .day-dot {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--card2);
+    border: 1.5px solid var(--border);
+    margin: 0 auto;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .day-dot.active {
+    background: var(--teal-dim);
+    border-color: var(--teal);
+    box-shadow: 0 0 10px var(--teal-dim);
+  }
+  .day-dot.today {
+    background: rgba(245,197,24,0.15);
+    border-color: var(--yellow);
+  }
+
+  /* NOTIFICATION TOAST */
+  .toast {
+    position: fixed;
+    bottom: 28px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--card);
+    border: 1px solid var(--teal);
+    color: var(--teal);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    padding: 12px 26px;
+    border-radius: 30px;
+    box-shadow: 0 0 24px var(--teal-dim);
+    z-index: 100;
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+  @media (max-width: 700px) {
+    .grid { grid-template-columns: 1fr 1fr; }
+    .timer-card { grid-column: 1 / 3; grid-row: 1; }
+    .setup-card { grid-column: 1; grid-row: 2; }
+    .duration-card { grid-column: 2; grid-row: 2; }
+    .calories-card { grid-column: 1; grid-row: 3; }
+    .streak-card { grid-column: 2; grid-row: 3; }
+    .timer-card { flex-direction: row; flex-wrap: wrap; justify-content: space-around; align-items: center; }
+    .timer-ring-wrap { margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <h1 class="page-title">Fitness Tracker</h1>
+
+  <!-- Hero Banner -->
+  <div class="hero">
+    <h2>Track Your Progress With Purpose <span>💪</span></h2>
+    <p>A stylish and flexible fitness tracker designed to enhance your workout experience. Customize difficulty levels, set timer, and stay motivated through a user-focused design.</p>
+  </div>
+
+  <!-- Main Grid -->
+  <div class="grid">
+
+    <!-- TIMER CARD -->
+    <div class="card timer-card">
+      <div class="card-label">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 15.5 14"/></svg>
+        Timer
+      </div>
+      <div class="timer-ring-wrap">
+        <svg viewBox="0 0 160 160" width="160" height="160">
+          <circle class="ring-bg" cx="80" cy="80" r="70"/>
+          <circle class="ring-progress" id="ringProgress" cx="80" cy="80" r="70"/>
+        </svg>
+        <div class="timer-display">
+          <span class="timer-min-label">MIN</span>
+          <div class="timer-time" id="timerDisplay">10:00</div>
+          <span class="timer-sec-label">SEC</span>
+        </div>
+      </div>
+      <div class="timer-controls">
+        <div class="btn-icon" id="resetBtn" title="Reset">↺</div>
+        <button class="btn-start" id="startBtn">START</button>
+        <div class="btn-icon" id="muteBtn" title="Sound">🎧</div>
+      </div>
+    </div>
+
+    <!-- WORKOUT SETUP CARD -->
+    <div class="card setup-card">
+      <div class="card-label">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        Set Up Your Workout
+      </div>
+      <div class="difficulty-btns">
+        <button class="diff-btn" data-diff="newbie" onclick="setDifficulty(this)">Newbie</button>
+        <button class="diff-btn active" data-diff="confident" onclick="setDifficulty(this)">Confident</button>
+        <button class="diff-btn" data-diff="beast" onclick="setDifficulty(this)">Beast Mode</button>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">Workout Duration</span>
+        <span><span class="stat-val" id="setupDuration">10:00</span><span class="stat-unit">MIN</span></span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-name">Calories Spent</span>
+        <span><span class="stat-val" id="setupCalories">600</span><span class="stat-unit">KCAL</span></span>
+      </div>
+    </div>
+
+    <!-- DURATION CARD -->
+    <div class="card duration-card">
+      <div class="card-label">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 15.5 14"/></svg>
+        Workout Duration
+      </div>
+      <div class="duration-control">
+        <button class="dur-btn" onclick="changeDuration(-1)">−</button>
+        <div>
+          <div class="dur-time" id="durDisplay">10:00</div>
+          <div class="dur-label">MIN</div>
+        </div>
+        <button class="dur-btn" onclick="changeDuration(1)">+</button>
+      </div>
+    </div>
+
+    <!-- CALORIES CARD -->
+    <div class="card calories-card">
+      <div class="card-label">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2C9 6 6 9 6 13a6 6 0 0012 0c0-4-3-7-6-11z"/></svg>
+        Calories Burned
+      </div>
+      <div class="gauge-wrap">
+        <svg viewBox="0 0 150 80" width="150" height="80">
+          <!-- semicircle: center 75,80, r=65 -->
+          <path class="gauge-bg" d="M 10,80 A 65,65 0 0,1 140,80" />
+          <path class="gauge-fill" id="gaugeFill" d="M 10,80 A 65,65 0 0,1 140,80" />
+        </svg>
+        <div class="gauge-val">
+          <span class="gauge-num" id="caloriesBurned">0</span>
+          <span class="gauge-sub">Remaining</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STREAK CARD -->
+    <div class="card streak-card">
+      <div class="card-label">
+        <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+        Activity Streak
+      </div>
+      <div class="streak-day-badge">DAY</div>
+      <div class="streak-num" id="streakNum">2<span>/7</span></div>
+      <div class="days-row" id="daysRow"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ─── STATE ───────────────────────────────────────
+  const difficulties = {
+    newbie:    { duration: 5,  calories: 300 },
+    confident: { duration: 10, calories: 600 },
+    beast:     { duration: 20, calories: 1200 },
+  };
+  let currentDiff = 'confident';
+  let totalSeconds = 600;
+  let remaining = 600;
+  let running = false;
+  let intervalId = null;
+  let streakDays = [true, true, false, false, false, false, false]; // Sun=0
+  const DAYS = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  const TODAY_IDX = new Date().getDay();
+
+  // Gauge path lengths (semicircle)
+  const GAUGE_LEN = Math.PI * 65; // ~204.2
+
+  // ─── TIMER ───────────────────────────────────────
+  function fmt(s) {
+    const m = Math.floor(s / 60).toString().padStart(2,'0');
+    const sec = (s % 60).toString().padStart(2,'0');
+    return `${m}:${sec}`;
+  }
+
+  function updateTimerUI() {
+    document.getElementById('timerDisplay').textContent = fmt(remaining);
+    const progress = remaining / totalSeconds;
+    const circ = 2 * Math.PI * 70;
+    document.getElementById('ringProgress').style.strokeDasharray = circ;
+    document.getElementById('ringProgress').style.strokeDashoffset = circ * (1 - progress);
+
+    // Update calories burned (proportional to time elapsed)
+    const elapsed = totalSeconds - remaining;
+    const maxCal = difficulties[currentDiff].calories;
+    const burned = Math.round((elapsed / totalSeconds) * maxCal);
+    document.getElementById('caloriesBurned').textContent = (maxCal - burned);
+    updateGauge(elapsed / totalSeconds);
+  }
+
+  function updateGauge(ratio) {
+    const fill = document.getElementById('gaugeFill');
+    // Semicircle from left (10,80) to right (140,80) through top
+    // stroke-dashoffset trick on path
+    fill.style.strokeDasharray = GAUGE_LEN;
+    fill.style.strokeDashoffset = GAUGE_LEN * (1 - Math.min(ratio, 1));
+  }
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    if (!running) {
+      running = true;
+      document.getElementById('startBtn').textContent = 'PAUSE';
+      document.getElementById('startBtn').classList.add('active');
+      intervalId = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          remaining = 0;
+          clearInterval(intervalId);
+          running = false;
+          document.getElementById('startBtn').textContent = 'DONE!';
+          document.getElementById('startBtn').classList.remove('active');
+          markToday();
+          showToast('🎉 Workout Complete! Great job!');
+        }
+        updateTimerUI();
+      }, 1000);
+    } else {
+      running = false;
+      clearInterval(intervalId);
+      document.getElementById('startBtn').textContent = 'RESUME';
+      document.getElementById('startBtn').classList.remove('active');
+    }
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', () => {
+    clearInterval(intervalId);
+    running = false;
+    remaining = totalSeconds;
+    document.getElementById('startBtn').textContent = 'START';
+    document.getElementById('startBtn').classList.remove('active');
+    updateTimerUI();
+  });
+
+  // ─── DIFFICULTY ──────────────────────────────────
+  function setDifficulty(btn) {
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentDiff = btn.dataset.diff;
+    const d = difficulties[currentDiff];
+    totalSeconds = d.duration * 60;
+    remaining = totalSeconds;
+    clearInterval(intervalId);
+    running = false;
+    document.getElementById('startBtn').textContent = 'START';
+    document.getElementById('startBtn').classList.remove('active');
+    document.getElementById('setupDuration').textContent = fmt(totalSeconds);
+    document.getElementById('setupCalories').textContent = d.calories;
+    document.getElementById('durDisplay').textContent = `${String(d.duration).padStart(2,'0')}:00`;
+    document.getElementById('caloriesBurned').textContent = d.calories;
+    updateGauge(0);
+    updateTimerUI();
+  }
+
+  // ─── DURATION CONTROL ────────────────────────────
+  function changeDuration(delta) {
+    const d = difficulties[currentDiff];
+    d.duration = Math.max(1, Math.min(60, d.duration + delta));
+    totalSeconds = d.duration * 60;
+    remaining = totalSeconds;
+    clearInterval(intervalId); running = false;
+    document.getElementById('startBtn').textContent = 'START';
+    document.getElementById('startBtn').classList.remove('active');
+    document.getElementById('durDisplay').textContent = `${String(d.duration).padStart(2,'0')}:00`;
+    document.getElementById('setupDuration').textContent = fmt(totalSeconds);
+    updateTimerUI();
+  }
+
+  // ─── STREAK ──────────────────────────────────────
+  function renderStreak() {
+    const row = document.getElementById('daysRow');
+    row.innerHTML = '';
+    const activeDays = streakDays.filter(Boolean).length;
+    document.getElementById('streakNum').innerHTML = `${activeDays}<span>/7</span>`;
+    DAYS.forEach((day, i) => {
+      const item = document.createElement('div');
+      item.className = 'day-item';
+      const label = document.createElement('div');
+      label.className = 'day-label';
+      label.textContent = day;
+      const dot = document.createElement('div');
+      dot.className = 'day-dot' + (streakDays[i] ? ' active' : '') + (i === TODAY_IDX ? ' today' : '');
+      dot.textContent = streakDays[i] ? '★' : '☆';
+      dot.title = day;
+      dot.onclick = () => {
+        streakDays[i] = !streakDays[i];
+        renderStreak();
+      };
+      item.append(label, dot);
+      row.appendChild(item);
+    });
+  }
+
+  function markToday() {
+    streakDays[TODAY_IDX] = true;
+    renderStreak();
+  }
+
+  // ─── TOAST ───────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  // ─── INIT ────────────────────────────────────────
+  updateTimerUI();
+  updateGauge(0);
+  renderStreak();
+
+  // Init gauge dasharray
+  document.getElementById('gaugeFill').style.strokeDasharray = GAUGE_LEN;
+  document.getElementById('gaugeFill').style.strokeDashoffset = GAUGE_LEN;
+
+  // Init ring
+  const circ = 2 * Math.PI * 70;
+  document.getElementById('ringProgress').style.strokeDasharray = circ;
+  document.getElementById('ringProgress').style.strokeDashoffset = 0;
+
+  document.getElementById('caloriesBurned').textContent = difficulties[currentDiff].calories;
+</script>
+</body>
+</html>
